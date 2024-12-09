@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps Blog</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>DevOps Learning Blog</h1>
+        <p>Sharing insights and tutorials about DevOps tools and practices</p>
+    </header>
+    <main>
+        <section class="blog-list">
+            <% posts.forEach(post => { %>
+                <article>
+                    <h2><a href="/post/<%= post.id %>"><%= post.title %></a></h2>
+                    <p><small><%= post.date %></small></p>
+                    <p><%= post.content.substring(0, 100) %>...</p>
+                </article>
+            <% }) %>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 DevOps Blog</p>
+    </footer>
+</body>
+</html>
