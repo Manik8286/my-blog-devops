@@ -1,6 +1,6 @@
-// app.js
 const express = require('express');
 const path = require('path');
+const connect = require('./db'); // Database connection file
 
 const app = express();
 const PORT = 3000;
@@ -12,33 +12,30 @@ app.set('views', path.join(__dirname, 'views'));
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Dummy blog data
-const blogPosts = [
-    {
-        id: 1,
-        title: 'Understanding Docker Basics',
-        date: '2024-12-01',
-        content: 'Docker is a containerization platform that allows developers to package applications...'
-    },
-    {
-        id: 2,
-        title: 'Kubernetes for Beginners',
-        date: '2024-12-02',
-        content: 'Kubernetes is an open-source orchestration tool for managing containerized applications...'
-    }
-];
-
 // Routes
-app.get('/', (req, res) => {
-    res.render('index', { posts: blogPosts });
+app.get('/', async (req, res) => {
+    try {
+        const db = await connect();
+        const posts = await db.collection('posts').find().sort({ createdAt: -1 }).toArray();
+        res.render('index', { posts });
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        res.status(500).send('Error loading posts');
+    }
 });
 
-app.get('/post/:id', (req, res) => {
-    const post = blogPosts.find(p => p.id === parseInt(req.params.id));
-    if (post) {
-        res.render('post', { post });
-    } else {
-        res.status(404).send('Post not found');
+app.get('/post/:id', async (req, res) => {
+    try {
+        const db = await connect();
+        const post = await db.collection('posts').findOne({ _id: new require('mongodb').ObjectId(req.params.id) });
+        if (post) {
+            res.render('post', { post });
+        } else {
+            res.status(404).send('Post not found');
+        }
+    } catch (error) {
+        console.error('Error fetching post:', error);
+        res.status(500).send('Error loading post');
     }
 });
 
